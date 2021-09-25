@@ -1,1 +1,1 @@
-Yet an incomplete idoly-pride assets decryptor.
+Yet an incomplete idoly-pride manifest decryptor.
