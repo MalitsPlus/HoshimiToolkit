@@ -5,6 +5,7 @@ import json
 import octodb_pb2
 import sqlite3
 import sys
+import re
 from rich.console import Console
 from Crypto.Cipher import AES
 from Crypto.Util.Padding import unpad
@@ -74,27 +75,16 @@ def decryptCache(key = KEY, iv = IV) -> octodb_pb2.Database:
     return protoDatabase
 
 def protoDb2Json(protoDb: octodb_pb2.Database) -> str:
-    """Converts a protobuf serialized object to JSON strings then write it into a file."""
-
+    """Converts a protobuf serialized object to JSON string then return the string."""
     jsonDb = MessageToJson(protoDb)
-    outputPath = Path(f"{outputPathString}/manifest_v{protoDb.revision}.json")
-    # Write the decrypted cache to a json file
-    try:
-        outputPath.parent.mkdir(parents=True, exist_ok=True)
-        outputPath.write_text(jsonDb)
-        console.print(f"[bold green]>>> [Succeed][/bold green] Decrypted JSON has been written into {outputPath}.\n")
-    except:
-        console.print(f"[bold red]>>> [Error][/bold red] Failed to write decrypted JSON into {outputPath}.\n{sys.exc_info()}\n")
-        raise
     return jsonDb
 
-def createSQLiteDB(jsonString: str):
+def createSQLiteDB(jDict: dict, outputString: str, isDiff: bool = False):
     """Converts json to SQLite database."""
-    jsonData = json.loads(jsonString)
     try:
-        conn = sqlite3.connect("ipr/DecryptedCaches/manifest.db")
+        conn = sqlite3.connect(outputString)
     except:
-        console.print(f"[bold red]>>> [Error][/bold red] Failed to connect or create manifest.db.\n{sys.exc_info()}\n")
+        console.print(f"[bold red]>>> [Error][/bold red] Failed to connect or create db file.\n{sys.exc_info()}\n")
         return
 
     cur = conn.cursor()
@@ -152,9 +142,9 @@ def createSQLiteDB(jsonString: str):
         return
 
     try:
-        revision = jsonData.get("revision")
-        urlFormat = jsonData.get("urlFormat")
-        tagname = jsonData.get("tagname")
+        revision = jDict.get("revision")
+        urlFormat = jDict.get("urlFormat")
+        tagname = jDict.get("tagname")
 
         cur.execute("DELETE FROM manifest")
         cur.execute(f"""
@@ -164,7 +154,7 @@ def createSQLiteDB(jsonString: str):
         '{ tagname }'
         )""")
         
-        for assetBundleList in jsonData["assetBundleList"]: 
+        for assetBundleList in jDict["assetBundleList"]: 
             id = assetBundleList.get("id")
             filepath = assetBundleList.get("filepath")
             name = assetBundleList.get("name")
@@ -197,7 +187,7 @@ def createSQLiteDB(jsonString: str):
             { f"'{name[0:3]}'" if name != None else "NULL"}
             )""")
 
-        for resourceList in jsonData["resourceList"]: 
+        for resourceList in jDict["resourceList"]: 
             id = resourceList.get("id")
             filepath = resourceList.get("filepath")
             name = resourceList.get("name")
@@ -236,11 +226,57 @@ def createSQLiteDB(jsonString: str):
         conn.rollback()
         conn.close()
         console.print(f"[bold red]>>> [Error][/bold red] Failed to insert data into tables.\n{sys.exc_info()}\n")
+        raise
         return
 
     conn.close()
     return
 
+def diffRevision(jDict: dict):
+    p = Path(outputPathString)
+    manifestList = [it for it in p.iterdir() if re.match(r"^manifest_v\d+.json$", it.name)]
+    if manifestList.count == 0: 
+        console.print(f"[bold]>>> [Info][/bold] No previous revision json found.\n")
+        return
+    manifestList.sort(key=lambda it: it.name, reverse=True)
+    previousOne = manifestList[0]
+    jDictPrev = json.loads(previousOne.read_bytes())
+    if jDictPrev["revision"] >= jDict["revision"]:
+        console.print(f"[bold yellow]>>> [Warning][/bold yellow] Duplicate or old revision, diff operation has been stopped.\n")
+        return
+    diffDict = {
+        "revision": jDict["revision"],
+        "assetBundleList": [ it1 for it1 in jDict["assetBundleList"] if it1 not in jDictPrev["assetBundleList"] ],
+        "resourceList": [ it2 for it2 in jDict["resourceList"] if it2 not in jDictPrev["resourceList"] ]
+    }
+    diffOutputString = f"{outputPathString}/manifest_diff_v{jDictPrev['revision']}_{jDict['revision']}.json"
+    diffOutputPath = Path(diffOutputString)
+    writeJsonFile(json.dumps(diffDict, sort_keys=True, indent=4), diffOutputPath)
+    createSQLiteDB(diffDict, f"{diffOutputString[0:-5]}.db", True)
+
+def writeJsonFile(jsonString: str, path: Path):
+    # Write the string to a json file
+    try:
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_text(jsonString)
+        console.print(f"[bold green]>>> [Succeed][/bold green] JSON has been written into {path}.\n")
+    except:
+        console.print(f"[bold red]>>> [Error][/bold red] Failed to write JSON into {path}.\n{sys.exc_info()}\n")
+        raise
+
+# Decrypt cache file
 protoDb = decryptCache()
+# Convert protobuf to json string
 jsonString = protoDb2Json(protoDb)
-createSQLiteDB(jsonString)
+# Deserialize json string to a dict
+jDict = json.loads(jsonString)
+# Define SQLite DB file output path string
+pathString = f"ipr/DecryptedCaches/manifest_v{jDict['revision']}.db"
+# Create SQLite DB file
+createSQLiteDB(jDict, pathString)
+# Diff 
+diffRevision(jDict)
+# Define the output path of json file
+outputPath = Path(f"{outputPathString}/manifest_v{protoDb.revision}.json")
+# Write the json string into a file
+writeJsonFile(jsonString, outputPath)
