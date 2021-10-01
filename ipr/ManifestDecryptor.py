@@ -38,6 +38,7 @@ def decryptCache(key = KEY, iv = IV) -> octodb_pb2.Database:
 
     key = hashlib.md5(key).digest()
     iv = hashlib.md5(iv).digest()
+    
     cipher = AES.new(key, AES.MODE_CBC, iv) 
     encryptCachePath = Path(inputPathString)
 
@@ -168,6 +169,7 @@ def createSQLiteDB(jDict: dict, outputString: str, isDiff: bool = False):
             objectName = assetBundleList.get("objectName")
             generation = assetBundleList.get("generation")
             uploadVersionId = assetBundleList.get("uploadVersionId")
+            _type = assetBundleList.get("type")
 
             cur.execute(f"""
             INSERT OR REPLACE INTO assetBundleList VALUES (
@@ -184,7 +186,7 @@ def createSQLiteDB(jDict: dict, outputString: str, isDiff: bool = False):
             { f"'{objectName}'" if objectName != None else "NULL"},
             { generation if generation != None else "NULL" },
             { uploadVersionId if uploadVersionId != None else "NULL" },
-            { f"'{name[0:3]}'" if name != None else "NULL"}
+            { f"'{_type}'" if _type != None else "NULL"}
             )""")
 
         for resourceList in jDict["resourceList"]: 
@@ -201,6 +203,7 @@ def createSQLiteDB(jDict: dict, outputString: str, isDiff: bool = False):
             objectName = resourceList.get("objectName")
             generation = resourceList.get("generation")
             uploadVersionId = resourceList.get("uploadVersionId")
+            _type = resourceList.get("type")
 
             cur.execute(f"""
             INSERT OR REPLACE INTO resourceList VALUES (
@@ -217,7 +220,7 @@ def createSQLiteDB(jDict: dict, outputString: str, isDiff: bool = False):
             { f"'{objectName}'" if objectName != None else "NULL"},
             { generation if generation != None else "NULL" },
             { uploadVersionId if uploadVersionId != None else "NULL" },
-            { f"'{name[0:3]}'" if name != None else "NULL"}
+            { f"'{_type}'" if _type != None else "NULL"}
             )""")
 
         conn.commit()
@@ -244,25 +247,69 @@ def diffRevision(jDict: dict):
     if jDictPrev["revision"] >= jDict["revision"]:
         console.print(f"[bold yellow]>>> [Warning][/bold yellow] Duplicate or old revision, diff operation has been stopped.\n")
         return
-    diffDict = {
-        "revision": jDict["revision"],
-        "assetBundleList": [ it1 for it1 in jDict["assetBundleList"] if it1 not in jDictPrev["assetBundleList"] ],
-        "resourceList": [ it2 for it2 in jDict["resourceList"] if it2 not in jDictPrev["resourceList"] ]
+    
+    assetBundlePrevDict = {
+        it["id"]: it["generation"]
+        for it in jDictPrev["assetBundleList"]
     }
-    diffOutputString = f"{outputPathString}/manifest_diff_v{jDictPrev['revision']}_{jDict['revision']}.json"
-    diffOutputPath = Path(diffOutputString)
-    writeJsonFile(json.dumps(diffDict, sort_keys=True, indent=4), diffOutputPath)
-    createSQLiteDB(diffDict, f"{diffOutputString[0:-5]}.db", True)
+    resourcePrevDict = {
+        it["id"]: it["generation"]
+        for it in jDictPrev["resourceList"] 
+    }
 
-def writeJsonFile(jsonString: str, path: Path):
+    diffNewDict = {
+        "revision": jDict["revision"],
+        "assetBundleList": [ it1 for it1 in jDict["assetBundleList"] if it1["id"] not in assetBundlePrevDict.keys() ],
+        "resourceList": [ it2 for it2 in jDict["resourceList"] if it2["id"] not in resourcePrevDict.keys() ]
+    }
+    diffChangedDict = {
+        "revision": jDict["revision"],
+        "assetBundleList": [ it1 for it1 in jDict["assetBundleList"] if it1["id"] in assetBundlePrevDict.keys() and it1["generation"] != assetBundlePrevDict[it1["id"]] ],
+        "resourceList": [ it2 for it2 in jDict["resourceList"] if it2["id"] in resourcePrevDict.keys() and it2["generation"] != resourcePrevDict[it2["id"]] ]
+    }
+
+    # diffChangeDict = {
+    #     "revision": jDict["revision"],
+    #     "assetBundleList": [ it1 for it1 in jDict["assetBundleList"] if it1 not in jDictPrev["assetBundleList"] ],
+    #     "resourceList": [ it2 for it2 in jDict["resourceList"] if it2 not in jDictPrev["resourceList"] ]
+    # }
+
+    diffOutputString = f"{outputPathString}/manifest_diff_new_v{jDictPrev['revision']}_{jDict['revision']}.json"
+    diffOutputPath = Path(diffOutputString)
+    writeJsonFile(json.dumps(diffNewDict, sort_keys=True, indent=4), diffOutputPath)
+    createSQLiteDB(diffNewDict, f"{diffOutputString[0:-5]}.db", True)
+
+    diffOutputString = f"{outputPathString}/manifest_diff_changed_v{jDictPrev['revision']}_{jDict['revision']}.json"
+    diffOutputPath = Path(diffOutputString)
+    writeJsonFile(json.dumps(diffChangedDict, sort_keys=True, indent=4), diffOutputPath)
+    createSQLiteDB(diffChangedDict, f"{diffOutputString[0:-5]}.db", True)
+
+def writeJsonFile(d: dict, path: Path):
     # Write the string to a json file
     try:
         path.parent.mkdir(parents=True, exist_ok=True)
-        path.write_text(jsonString)
+        path.write_text(json.dumps(d, sort_keys=True, indent=4))
         console.print(f"[bold green]>>> [Succeed][/bold green] JSON has been written into {path}.\n")
     except:
         console.print(f"[bold red]>>> [Error][/bold red] Failed to write JSON into {path}.\n{sys.exc_info()}\n")
         raise
+
+def appendType(d: dict) -> dict:
+    for it in d["assetBundleList"]:
+        m = re.match(r"(.+?)_.*$", it["name"])  # Matches first _ in name
+        if m:
+            typeStr = m.group(1)
+        else:
+            typeStr = "others"
+        it["type"] = typeStr
+    for it in d["resourceList"]:
+        m = re.match(r"(.+?)_.*$", it["name"])  # Matches first _ in name
+        if m:
+            typeStr = m.group(1)
+        else:
+            typeStr = "others"
+        it["type"] = typeStr
+    return d
 
 # Decrypt cache file
 protoDb = decryptCache()
@@ -270,6 +317,7 @@ protoDb = decryptCache()
 jsonString = protoDb2Json(protoDb)
 # Deserialize json string to a dict
 jDict = json.loads(jsonString)
+jDict = appendType(jDict)
 # Define SQLite DB file output path string
 pathString = f"ipr/DecryptedCaches/manifest_v{jDict['revision']}.db"
 # Create SQLite DB file
@@ -279,4 +327,4 @@ diffRevision(jDict)
 # Define the output path of json file
 outputPath = Path(f"{outputPathString}/manifest_v{protoDb.revision}.json")
 # Write the json string into a file
-writeJsonFile(jsonString, outputPath)
+writeJsonFile(jDict, outputPath)

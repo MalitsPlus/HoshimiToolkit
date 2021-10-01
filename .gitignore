@@ -130,3 +130,6 @@ dmypy.json
 
 # Costum files
 *.db
+ipr/Assets
+ipr/DecryptedCaches
+ipr/EncryptedCache
