@@ -63,7 +63,6 @@ void CryptByString(uint8_t* input, int32_t input_len, uint8_t** output, uint8_t*
 
     uint8_t* buffer = (uint8_t*)malloc(input_len);
     memcpy(buffer, input, input_len);
-    headerLength = input_len;
 
     byteslen = maskStringlen << 1;
     maskBytes = (uint8_t*)malloc(byteslen);

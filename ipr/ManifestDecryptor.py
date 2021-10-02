@@ -1,5 +1,3 @@
-# Decryption parts are mostly referenced from https://github.com/190nm/rein-kuro
-
 import hashlib
 import json
 import octodb_pb2
@@ -311,20 +309,22 @@ def appendType(d: dict) -> dict:
         it["type"] = typeStr
     return d
 
-# Decrypt cache file
-protoDb = decryptCache()
-# Convert protobuf to json string
-jsonString = protoDb2Json(protoDb)
-# Deserialize json string to a dict
-jDict = json.loads(jsonString)
-jDict = appendType(jDict)
-# Define SQLite DB file output path string
-pathString = f"ipr/DecryptedCaches/manifest_v{jDict['revision']}.db"
-# Create SQLite DB file
-createSQLiteDB(jDict, pathString)
-# Diff 
-diffRevision(jDict)
-# Define the output path of json file
-outputPath = Path(f"{outputPathString}/manifest_v{protoDb.revision}.json")
-# Write the json string into a file
-writeJsonFile(jDict, outputPath)
+def doDecrypt() -> dict:
+    # Decrypt cache file
+    protoDb = decryptCache()
+    # Convert protobuf to json string
+    jsonString = protoDb2Json(protoDb)
+    # Deserialize json string to a dict
+    jDict = json.loads(jsonString)
+    jDict = appendType(jDict)
+    # Define SQLite DB file output path string
+    pathString = f"ipr/DecryptedCaches/manifest_v{jDict['revision']}.db"
+    # Create SQLite DB file
+    createSQLiteDB(jDict, pathString)
+    # Diff 
+    diffRevision(jDict)
+    # Define the output path of json file
+    outputPath = Path(f"{outputPathString}/manifest_v{protoDb.revision}.json")
+    # Write the json string into a file
+    writeJsonFile(jDict, outputPath)
+    return jDict
