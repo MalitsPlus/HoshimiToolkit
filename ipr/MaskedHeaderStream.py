@@ -1,8 +1,8 @@
 from rich.console import Console
 from pathlib import Path
 
-inputDirectory = "ipr/Assets/"
-outputPath = "ipr/UnobfuscateAssets/"
+__inputDirectory = "ipr/Assets/"
+__outputPath = "ipr/UnobfuscateAssets/"
 console = Console()
 
 def unObfuscate(assetList: list, offset: int = 0, streamPos: int = 0, headerLength: int = 256):
@@ -18,11 +18,11 @@ def unObfuscate(assetList: list, offset: int = 0, streamPos: int = 0, headerLeng
         it["md5"] : it["type"]
         for it in assetList
     }
-    contents = Path(inputDirectory).glob("**")
+    contents = Path(__inputDirectory).glob("**/*")
     try:
         filePaths = [path for path in contents if path.name in md5NameDict]
     except FileNotFoundError:
-        console.print(f"[bold red]>>> [Error][/bold red] Folder '{inputDirectory}' is not exists. Unobfuscation has been discarted.")
+        console.print(f"[bold red]>>> [Error][/bold red] Folder '{__inputDirectory}' is not exists. Unobfuscation has been discarted.")
         return
 
     filePaths.sort(key=lambda x: x.name)
@@ -36,14 +36,17 @@ def unObfuscate(assetList: list, offset: int = 0, streamPos: int = 0, headerLeng
         md5 = path.name
         name = md5NameDict.get(md5)
         if buff[0:5] == unitySignature:
-            path.rename(path.parent.joinpath(name + ".unity3d"))
+            _type = md5TypeDict.get(md5)
+            exportFolder = Path(__outputPath).joinpath(_type)
+            exportFolder.mkdir(parents=True, exist_ok=True)
+            exportFolder.joinpath(name + ".unity3d").write_bytes(buff)
             console.print(f"[bold withe]>>> [Info][/bold withe] ({count}/{allCount}) Assetbundle '{ name }.unity3d' is a non-obfuscated file.")
             continue
         else:
-            unityFS = cryptByString(buff, md5NameDict[md5], offset, streamPos, headerLength)
+            unityFS = __cryptByString(buff, md5NameDict[md5], offset, streamPos, headerLength)
             if unityFS.__len__() > 0 and unityFS[0:5] == unitySignature:
                 _type = md5TypeDict.get(md5)
-                exportFolder = Path(outputPath).joinpath(_type)
+                exportFolder = Path(__outputPath).joinpath(_type)
                 exportFolder.mkdir(parents=True, exist_ok=True)
                 flag = exportFolder.joinpath(name + ".unity3d").write_bytes(unityFS)
                 if flag:
@@ -57,7 +60,36 @@ def unObfuscate(assetList: list, offset: int = 0, streamPos: int = 0, headerLeng
                 
     console.print(f"[bold white]>>> [Info][/bold white] Unobfuscating operations all done, { errorCount } error(s) were occurred during the entire workflow.")
 
-def stringToMaskBytes(maskString: str, maskStringLength: int, bytesLength: int) -> bytes:
+def rename(resourceList: list):
+    md5NameDict = {
+        it["md5"] : it["name"]
+        for it in resourceList
+    }
+    md5TypeDict = {
+        it["md5"] : it["type"]
+        for it in resourceList
+    }
+    contents = Path(__inputDirectory).glob("**/*")
+    try:
+        filePaths = [path for path in contents if path.name in md5NameDict]
+    except FileNotFoundError:
+        console.print(f"[bold red]>>> [Error][/bold red] Folder '{__inputDirectory}' is not exists. Rename action has been discarted.")
+        return
+    filePaths.sort(key=lambda x: x.name)
+    count = 0
+    allCount = filePaths.__len__()
+    for path in filePaths:
+        count += 1
+        md5 = path.name
+        name = md5NameDict.get(md5)
+        _type = md5TypeDict.get(md5)
+        exportFolder = Path(__outputPath).joinpath(_type)
+        exportFolder.mkdir(parents=True, exist_ok=True)
+        exportFolder.joinpath(name).write_bytes(path.read_bytes())
+        console.print(f"[bold green]>>> [Succeed][/bold green] ({count}/{allCount}) Resource '{ name }' has been successfully renamed.")
+    console.print(f"[bold white]>>> [Info][/bold white] Rename operations all done.")
+
+def __stringToMaskBytes(maskString: str, maskStringLength: int, bytesLength: int) -> bytes:
     # maskBytes = bytes(bytesLength)
     maskBytes = bytearray(bytesLength)
     if maskString != 0:
@@ -71,7 +103,7 @@ def stringToMaskBytes(maskString: str, maskStringLength: int, bytesLength: int) 
                 j += 1
                 maskBytes[i] = charJ
                 i += 2
-                charJ = ~charJ & 0xFF   # You must add &0xFF to get a unsigned integer in python or it will return signed one
+                charJ = ~charJ & 0xFF   # You must add &0xFF to get a unsigned integer in python or it will return the signed one
                 maskBytes[k] = charJ    #.to_bytes(length=1, byteorder="little", signed=True)
                 k -= 2
         if bytesLength >= 1:
@@ -91,12 +123,12 @@ def stringToMaskBytes(maskString: str, maskStringLength: int, bytesLength: int) 
                 b += 1
     return bytes(maskBytes)
 
-def cryptByString(input: bytes, maskString: str, offset: int, streamPos: int, headerLength: int) -> bytes:
+def __cryptByString(input: bytes, maskString: str, offset: int, streamPos: int, headerLength: int) -> bytes:
     inputLength = input.__len__()
     maskStringLength = maskString.__len__()
     bytesLength = maskStringLength << 1
     buffer = bytearray(input)
-    maskBytes = stringToMaskBytes(maskString, maskStringLength, bytesLength)
+    maskBytes = __stringToMaskBytes(maskString, maskStringLength, bytesLength)
     i = 0
     while streamPos + i < headerLength:
         buffer[offset + i] ^= maskBytes[streamPos + i - int((streamPos + i) / bytesLength) * bytesLength]

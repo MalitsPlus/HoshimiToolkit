@@ -46,7 +46,7 @@ void StringToMaskBytes(uint16_t* maskString, uint32_t maskLen, uint8_t* maskByte
             do
             {
                 --l;
-                maskBytes[b] ^= (uint8_t)v13;   // ±ØĞëÏÈÇ¿×ªÎªµ¥×Ö½Ú
+                maskBytes[b] ^= (uint8_t)v13;   // å¿…é¡»å…ˆå¼ºè½¬ä¸ºå•å­—èŠ‚
                 b++;
             } while (l);
         }
@@ -67,12 +67,12 @@ void CryptByString(uint8_t* input, int32_t input_len, uint8_t** output, uint8_t*
     byteslen = maskStringlen << 1;
     maskBytes = (uint8_t*)malloc(byteslen);
     memset(maskBytes, 0x00, byteslen);
-    StringToMaskBytes((uint16_t*)maskString, maskStringlen, maskBytes, byteslen);
-    i = 0;
-    do {
-        buffer[offset + i] ^= maskBytes[streamPos + i - (streamPos + i) / byteslen * byteslen];
-        i++;
-    } while (streamPos + i < headerLength);
+StringToMaskBytes((uint16_t*)maskString, maskStringlen, maskBytes, byteslen);
+i = 0;
+do {
+    buffer[offset + i] ^= maskBytes[streamPos + i - (streamPos + i) / byteslen * byteslen];
+    i++;
+} while (streamPos + i < headerLength);
 
     *output = buffer;
 
@@ -102,7 +102,7 @@ int main()
 
     char16_t maskString16[] = u"sud_vo_home_ktn_talk-12-5";
 
-    int stringLength = sizeof(maskString16) / sizeof(maskString16[0]) - 1;  // c++»áÊ¤ÊÖÔÚ×Ö·û´®×îºó¼Ó¸ö\0
+    int stringLength = sizeof(maskString16) / sizeof(maskString16[0]) - 1;  // c++ä¼šèƒœæ‰‹åœ¨å­—ç¬¦ä¸²æœ€ååŠ ä¸ª\0
 
     CryptByString(buff, (int32_t)size, output, (uint8_t*)maskString16, stringLength, 0, 0, 256);
 }

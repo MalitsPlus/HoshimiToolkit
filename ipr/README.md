@@ -1,1 +1,1 @@
-Yet an incomplete idoly-pride manifest decryptor.
+IDOLY PRIDE manifest, assets, resources decryptor.

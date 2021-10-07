@@ -1,5 +1,6 @@
 import hashlib
 import json
+from eDiffMode import DiffMode
 import octodb_pb2
 import sqlite3
 import sys
@@ -11,17 +12,17 @@ from pathlib import Path
 from google.protobuf.json_format import MessageToJson
 
 # Currently known magic strings 
-KEY = "zkfuuwgc4eoxlaew"
-IV = "LvAUtf+tnz"
+__KEY = "zkfuuwgc4eoxlaew"
+__IV = "LvAUtf+tnz"
 
 # Input cache file and output directory strings
-inputPathString = "ipr/EncryptedCache/octocacheevai"
-outputPathString = "ipr/DecryptedCaches"
+__inputPathString = "ipr/EncryptedCache/octocacheevai"
+__outputPathString = "ipr/DecryptedCaches"
 
 # Initialization
 console = Console()
 
-def decryptCache(key = KEY, iv = IV) -> octodb_pb2.Database:
+def __decryptCache(key = __KEY, iv = __IV) -> octodb_pb2.Database:
     """Decrypts a cache file (usually named 'octocacheevai') and deserializes it to a protobuf object
     
     Args:
@@ -38,7 +39,7 @@ def decryptCache(key = KEY, iv = IV) -> octodb_pb2.Database:
     iv = hashlib.md5(iv).digest()
     
     cipher = AES.new(key, AES.MODE_CBC, iv) 
-    encryptCachePath = Path(inputPathString)
+    encryptCachePath = Path(__inputPathString)
 
     try: 
         encryptedBytes = encryptCachePath.read_bytes()
@@ -61,7 +62,7 @@ def decryptCache(key = KEY, iv = IV) -> octodb_pb2.Database:
     # Revision number should probably change with every update..?
     console.print(f"[bold]>>> [Info][/bold] Current revision : {protoDatabase.revision}\n")
     # Get output dir and append it to the filename
-    outputPath = Path(f"{outputPathString}/manifest_v{protoDatabase.revision}")
+    outputPath = Path(f"{__outputPathString}/manifest_v{protoDatabase.revision}")
     # Write the decrypted cache to a local file
     try:
         outputPath.parent.mkdir(parents=True, exist_ok=True)
@@ -73,12 +74,12 @@ def decryptCache(key = KEY, iv = IV) -> octodb_pb2.Database:
 
     return protoDatabase
 
-def protoDb2Json(protoDb: octodb_pb2.Database) -> str:
+def __protoDb2Json(protoDb: octodb_pb2.Database) -> str:
     """Converts a protobuf serialized object to JSON string then return the string."""
     jsonDb = MessageToJson(protoDb)
     return jsonDb
 
-def createSQLiteDB(jDict: dict, outputString: str, isDiff: bool = False):
+def __createSQLiteDB(jDict: dict, outputString: str, isDiff: bool = False):
     """Converts json to SQLite database."""
     try:
         conn = sqlite3.connect(outputString)
@@ -233,18 +234,18 @@ def createSQLiteDB(jDict: dict, outputString: str, isDiff: bool = False):
     conn.close()
     return
 
-def diffRevision(jDict: dict):
-    p = Path(outputPathString)
+def __diffRevision(jDict: dict) -> dict:
+    p = Path(__outputPathString)
     manifestList = [it for it in p.iterdir() if re.match(r"^manifest_v\d+.json$", it.name)]
     if manifestList.count == 0: 
         console.print(f"[bold]>>> [Info][/bold] No previous revision json found.\n")
-        return
+        return jDict
     manifestList.sort(key=lambda it: it.name, reverse=True)
     previousOne = manifestList[0]
     jDictPrev = json.loads(previousOne.read_bytes())
     if jDictPrev["revision"] >= jDict["revision"]:
         console.print(f"[bold yellow]>>> [Warning][/bold yellow] Duplicate or old revision, diff operation has been stopped.\n")
-        return
+        return jDict
     
     assetBundlePrevDict = {
         it["id"]: it["generation"]
@@ -272,17 +273,30 @@ def diffRevision(jDict: dict):
     #     "resourceList": [ it2 for it2 in jDict["resourceList"] if it2 not in jDictPrev["resourceList"] ]
     # }
 
-    diffOutputString = f"{outputPathString}/manifest_diff_new_v{jDictPrev['revision']}_{jDict['revision']}.json"
+    diffOutputString = f"{__outputPathString}/manifest_diff_new_v{jDictPrev['revision']}_{jDict['revision']}.json"
     diffOutputPath = Path(diffOutputString)
-    writeJsonFile(json.dumps(diffNewDict, sort_keys=True, indent=4), diffOutputPath)
-    createSQLiteDB(diffNewDict, f"{diffOutputString[0:-5]}.db", True)
+    __writeJsonFile(diffNewDict, diffOutputPath)
+    __createSQLiteDB(diffNewDict, f"{diffOutputString[0:-5]}.db", True)
 
-    diffOutputString = f"{outputPathString}/manifest_diff_changed_v{jDictPrev['revision']}_{jDict['revision']}.json"
+    diffOutputString = f"{__outputPathString}/manifest_diff_changed_v{jDictPrev['revision']}_{jDict['revision']}.json"
     diffOutputPath = Path(diffOutputString)
-    writeJsonFile(json.dumps(diffChangedDict, sort_keys=True, indent=4), diffOutputPath)
-    createSQLiteDB(diffChangedDict, f"{diffOutputString[0:-5]}.db", True)
+    __writeJsonFile(diffChangedDict, diffOutputPath)
+    __createSQLiteDB(diffChangedDict, f"{diffOutputString[0:-5]}.db", True)
+    diffDict = {
+        "assetBundleList": [],
+        "resourceList": []
+    }
+    for it in diffNewDict["assetBundleList"]:
+        diffDict["assetBundleList"].append(it)
+    for it in diffNewDict["resourceList"]:
+        diffDict["resourceList"].append(it)
+    for it in diffChangedDict["assetBundleList"]:
+        diffDict["assetBundleList"].append(it)
+    for it in diffChangedDict["resourceList"]:
+        diffDict["resourceList"].append(it)
+    return diffDict
 
-def writeJsonFile(d: dict, path: Path):
+def __writeJsonFile(d: dict, path: Path):
     # Write the string to a json file
     try:
         path.parent.mkdir(parents=True, exist_ok=True)
@@ -292,7 +306,7 @@ def writeJsonFile(d: dict, path: Path):
         console.print(f"[bold red]>>> [Error][/bold red] Failed to write JSON into {path}.\n{sys.exc_info()}\n")
         raise
 
-def appendType(d: dict) -> dict:
+def __appendType(d: dict) -> dict:
     for it in d["assetBundleList"]:
         m = re.match(r"(.+?)_.*$", it["name"])  # Matches first _ in name
         if m:
@@ -309,22 +323,25 @@ def appendType(d: dict) -> dict:
         it["type"] = typeStr
     return d
 
-def doDecrypt() -> dict:
+def doDecrypt(diffMode: DiffMode) -> dict:
     # Decrypt cache file
-    protoDb = decryptCache()
+    protoDb = __decryptCache()
     # Convert protobuf to json string
-    jsonString = protoDb2Json(protoDb)
+    jsonString = __protoDb2Json(protoDb)
     # Deserialize json string to a dict
     jDict = json.loads(jsonString)
-    jDict = appendType(jDict)
+    jDict = __appendType(jDict)
     # Define SQLite DB file output path string
     pathString = f"ipr/DecryptedCaches/manifest_v{jDict['revision']}.db"
     # Create SQLite DB file
-    createSQLiteDB(jDict, pathString)
+    __createSQLiteDB(jDict, pathString)
     # Diff 
-    diffRevision(jDict)
+    diffDict = __diffRevision(jDict)
     # Define the output path of json file
-    outputPath = Path(f"{outputPathString}/manifest_v{protoDb.revision}.json")
+    outputPath = Path(f"{__outputPathString}/manifest_v{protoDb.revision}.json")
     # Write the json string into a file
-    writeJsonFile(jDict, outputPath)
-    return jDict
+    __writeJsonFile(jDict, outputPath)
+    if diffMode == DiffMode.Diff:
+        return diffDict
+    else:
+        return jDict
