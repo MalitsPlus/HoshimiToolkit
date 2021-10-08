@@ -4,7 +4,7 @@ A series of dark magic that dealing with IDOLY PRIDE
 ## First things first 
 ***As a courtesy to other fans, please refrain from spoiling unreleased contents if any are found after decrypting.***
   
-***礼儀として、このツールを通じて見つけたまだリリースされてない如何なるコンテンツを他人へネタバレしないでください。***
+***礼儀として、このツールを通じて見つけたまだリリースされてない如何なるコンテンツを他人にネタバレしないでください。***
   
 ***出于对他人的礼貌，请不要向他人剧透任何你通过此工具发现的未上线内容或情报。***
   
