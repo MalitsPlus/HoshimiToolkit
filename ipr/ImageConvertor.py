@@ -1,0 +1,23 @@
+from os import path
+from PIL import Image
+from pathlib import Path
+from rich import console
+from rich.console import Console
+
+input = r"F:\UnityExtract\Texture2D"
+output = r"F:\UnityExtract\Converted"
+
+# The raw size is 2048 x 1024 
+innerSize = (1820, 1024)
+outterSize = (2048, 1152)
+
+console = Console()
+paths = Path(input).glob("**/*.png")
+count = 0
+countAll = paths.__sizeof__() - 5
+for p in paths:
+    count += 1
+    im = Image.open(p)
+    nim = im.resize(innerSize, resample=Image.LANCZOS, reducing_gap=3)
+    nim.save(fp=Path(output).joinpath(p.stem + ".webp"), format="webp", lossless=True, method=6)
+    console.print(f"[bold green]>>> [Info][/bold green] ({count}/{countAll}) '{p.name}' has been successfully converted.")
