@@ -19,5 +19,7 @@ for p in paths:
     count += 1
     im = Image.open(p)
     nim = im.resize(innerSize, resample=Image.LANCZOS, reducing_gap=3)
+    # Convert to webp or png
     nim.save(fp=Path(output).joinpath(p.stem + ".webp"), format="webp", lossless=True, method=6)
-    console.print(f"[bold green]>>> [Info][/bold green] ({count}/{countAll}) '{p.name}' has been successfully converted.")
+    # nim.save(fp=Path(output).joinpath("png").joinpath(p.name), format="png")
+    console.print(f"[bold green]>>> [Succeed][/bold green] ({count}/{countAll}) '{p.name}' has been successfully converted.")
