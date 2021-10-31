@@ -4,7 +4,8 @@ from pathlib import Path
 from rich import console
 from rich.console import Console
 
-input = r"F:\UnityExtract\Texture2D"
+# input = r"F:\UnityExtract\Texture2D"
+input = r"F:\UnityExtract\new"
 output = r"F:\UnityExtract\Converted"
 
 # The raw size is 2048 x 1024 

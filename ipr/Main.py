@@ -8,12 +8,12 @@ from eWorkingMode import WorkingMode
 # Diff, All
 diffMode = DiffMode.Diff
 # Local, Remote
-workingMode = WorkingMode.Local
+workingMode = WorkingMode.Remote
 # Adjust this param according to your PC's spec
 maxDownloadThread = 20
 
 jDict = doDecrypt(diffMode)
 if workingMode != WorkingMode.Local:
     downloadAll(jDict, maxDownloadThread)
-unObfuscate(jDict["assetBundleList"])
-rename(jDict["resourceList"])
+unObfuscate(jDict)
+rename(jDict)

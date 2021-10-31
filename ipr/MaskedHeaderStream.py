@@ -5,11 +5,12 @@ __inputDirectory = "ipr/Assets/"
 __outputPath = "ipr/UnobfuscateAssets/"
 console = Console()
 
-def unObfuscate(assetList: list, offset: int = 0, streamPos: int = 0, headerLength: int = 256):
+def unObfuscate(jDict: dict, offset: int = 0, streamPos: int = 0, headerLength: int = 256):
     """
     Args: 
         assetList (list): Assets list to unobfuscate
     """
+    assetList: list = jDict["assetBundleList"]
     md5NameDict = {
         it["md5"] : it["name"]
         for it in assetList
@@ -37,7 +38,7 @@ def unObfuscate(assetList: list, offset: int = 0, streamPos: int = 0, headerLeng
         name = md5NameDict.get(md5)
         if buff[0:5] == unitySignature:
             _type = md5TypeDict.get(md5)
-            exportFolder = Path(__outputPath).joinpath(_type)
+            exportFolder = Path(__outputPath).joinpath(str(jDict["revision"])).joinpath(_type)
             exportFolder.mkdir(parents=True, exist_ok=True)
             exportFolder.joinpath(name + ".unity3d").write_bytes(buff)
             console.print(f"[bold withe]>>> [Info][/bold withe] ({count}/{allCount}) Assetbundle '{ name }.unity3d' is a non-obfuscated file.")
@@ -46,7 +47,7 @@ def unObfuscate(assetList: list, offset: int = 0, streamPos: int = 0, headerLeng
             unityFS = __cryptByString(buff, md5NameDict[md5], offset, streamPos, headerLength)
             if unityFS.__len__() > 0 and unityFS[0:5] == unitySignature:
                 _type = md5TypeDict.get(md5)
-                exportFolder = Path(__outputPath).joinpath(_type)
+                exportFolder = Path(__outputPath).joinpath(str(jDict["revision"])).joinpath(_type)
                 exportFolder.mkdir(parents=True, exist_ok=True)
                 flag = exportFolder.joinpath(name + ".unity3d").write_bytes(unityFS)
                 if flag:
@@ -60,7 +61,8 @@ def unObfuscate(assetList: list, offset: int = 0, streamPos: int = 0, headerLeng
                 
     console.print(f"[bold white]>>> [Info][/bold white] Unobfuscating operations all done, { errorCount } error(s) were occurred during the entire workflow.")
 
-def rename(resourceList: list):
+def rename(jDict: dict):
+    resourceList: list = jDict["resourceList"]
     md5NameDict = {
         it["md5"] : it["name"]
         for it in resourceList
@@ -83,7 +85,7 @@ def rename(resourceList: list):
         md5 = path.name
         name = md5NameDict.get(md5)
         _type = md5TypeDict.get(md5)
-        exportFolder = Path(__outputPath).joinpath(_type)
+        exportFolder = Path(__outputPath).joinpath(str(jDict["revision"])).joinpath(_type)
         exportFolder.mkdir(parents=True, exist_ok=True)
         exportFolder.joinpath(name).write_bytes(path.read_bytes())
         console.print(f"[bold green]>>> [Succeed][/bold green] ({count}/{allCount}) Resource '{ name }' has been successfully renamed.")

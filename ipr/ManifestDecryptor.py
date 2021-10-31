@@ -243,7 +243,21 @@ def __diffRevision(jDict: dict) -> dict:
     manifestList.sort(key=lambda it: it.name, reverse=True)
     previousOne = manifestList[0]
     jDictPrev = json.loads(previousOne.read_bytes())
+    
+    if jDictPrev["revision"] > jDict["revision"]:
+        console.print(f"[bold yellow]>>> [Warning][/bold yellow] Old revision, diff operation has been stopped.\n")
+        return jDict
+
+    if jDictPrev["revision"] == jDict["revision"]:
+        if manifestList.__len__() == 1:
+            console.print(f"[bold yellow]>>> [Warning][/bold yellow] Duplicate revision, diff operation has been stopped.\n")
+            return jDict
+        console.print(f"[bold yellow]>>> [Warning][/bold yellow] Duplicate revision.\n")
+        jDictPrev = json.loads(manifestList[1].read_bytes())
+        
+
     if jDictPrev["revision"] >= jDict["revision"]:
+        jDictPrev = json.loads(manifestList[1].read_bytes())
         console.print(f"[bold yellow]>>> [Warning][/bold yellow] Duplicate or old revision, diff operation has been stopped.\n")
         return jDict
     
@@ -283,6 +297,7 @@ def __diffRevision(jDict: dict) -> dict:
     __writeJsonFile(diffChangedDict, diffOutputPath)
     __createSQLiteDB(diffChangedDict, f"{diffOutputString[0:-5]}.db", True)
     diffDict = {
+        "revision": jDict["revision"],
         "assetBundleList": [],
         "resourceList": []
     }
