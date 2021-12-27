@@ -1,3 +1,0 @@
-[submodule "ipr/Real-ESRGAN"]
-	path = ipr/Real-ESRGAN
-	url = https://github.com/xinntao/Real-ESRGAN.git
