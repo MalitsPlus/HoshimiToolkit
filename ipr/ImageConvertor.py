@@ -5,8 +5,8 @@ from rich import console
 from rich.console import Console
 
 # input = r"F:\UnityExtract\Texture2D"
-input = r"F:\UnityExtract\new"
-output = r"F:\UnityExtract\Converted"
+input = r"F:\CG\IDOLY PRIDE Extract\Texture2D"
+output = r"F:\CG\IDOLY PRIDE Extract"
 
 # The raw size is 2048 x 1024 
 innerSize = (1820, 1024)
@@ -21,6 +21,6 @@ for p in paths:
     im = Image.open(p)
     nim = im.resize(innerSize, resample=Image.LANCZOS, reducing_gap=3)
     # Convert to webp or png
-    nim.save(fp=Path(output).joinpath(p.stem + ".webp"), format="webp", lossless=True, method=6)
-    # nim.save(fp=Path(output).joinpath("png").joinpath(p.name), format="png")
+    # nim.save(fp=Path(output).joinpath(p.stem + ".webp"), format="webp", lossless=True, method=6)
+    nim.save(fp=Path(output).joinpath(p.name), format="png")
     console.print(f"[bold green]>>> [Succeed][/bold green] ({count}/{countAll}) '{p.name}' has been successfully converted.")

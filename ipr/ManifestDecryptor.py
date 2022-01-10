@@ -237,7 +237,7 @@ def __createSQLiteDB(jDict: dict, outputString: str, isDiff: bool = False):
 def __diffRevision(jDict: dict) -> dict:
     p = Path(__outputPathString)
     manifestList = [it for it in p.iterdir() if re.match(r"^manifest_v\d+.json$", it.name)]
-    if manifestList.count == 0: 
+    if manifestList.__len__() == 0: 
         console.print(f"[bold]>>> [Info][/bold] No previous revision json found.\n")
         return jDict
     manifestList.sort(key=lambda it: it.name, reverse=True)

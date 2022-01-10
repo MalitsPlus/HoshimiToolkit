@@ -8,7 +8,7 @@ import requests
 import time
 from concurrent.futures import ThreadPoolExecutor, thread, wait, ALL_COMPLETED
 import threading
-import wget
+# import wget
 
 console = Console()
 URL = "https://d2ilil7yh5oi1v.cloudfront.net/solis-{v}-{type}/{o}?generation={g}&alt=media"
