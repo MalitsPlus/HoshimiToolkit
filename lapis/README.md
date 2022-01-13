@@ -32,8 +32,4 @@ Before you decide to use this tool, you should realize even if you can use my re
 8. Now you are ready to go. Run LpsPkgMnfstDcpt and output AssetBundles should be generated in `./DecryptedFiles`. 
 
 ---
-You can check [my blog](https://malitsplus.blogspot.com/2021/09/idoly-pride-manifest.html) for further details. 
-0000	ldarg.0
-0001	ldarg.1
-0002	stfld	int32 Oz.GameKit.Version.AssetBundleInfo::'<EncryptKey>k__BackingField'
-0007	ret
+You can check [my blog](https://malitsplus.blogspot.com/2022/01/lapis-relights.html) for further details. 
