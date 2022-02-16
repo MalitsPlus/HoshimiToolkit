@@ -16,14 +16,14 @@ Before you decide to use this tool, you should realize even if you can use my re
         ldfld	int32 Oz.GameKit.Version.AssetBundleInfo::'<EncryptKey>k__BackingField'
         ret
         ```
-        And **set** accessor to: 
+        and **set** accessor to: 
         ```
         ldarg.0
         ldarg.1
         stfld	int32 Oz.GameKit.Version.AssetBundleInfo::'<EncryptKey>k__BackingField'
         ret
         ```
-        In the above examples, `<EncryptKey>` represents it is linked to field `<EncryptKey>k__BackingField`, you should change it to `<Name>` while editing property `Name`'s accessor. 
+        In the above examples, `<EncryptKey>` represents it is linked to field `<EncryptKey>k__BackingField`, you should change it to `<Name>` while editing property `Name`'s accessor, meanwhile, change `int32` to `string`. 
     - d. **Save module** as `Assembly-CSharp.dll`. Be certain you already have a backup before doing such things. 
 4. Copy `Assembly-CSharp.dll`, `Oz.GameFramework.Runtime.dll`, `Il2CppDummyDll.dll` to `./LpsPkgMnfstDcpt/bin/Debug/`. 
 5. Add the above 3 dlls to project **LpsPkgMnfstDcpt**'s reference. 
