@@ -9,8 +9,7 @@ A series of dark magic that deals with IDOLY PRIDE
 2. Move all assets and resources into `./Assets/` ( It's ok if you put them in subfolders )
 3. Run the following commands in your terminal, be noticed this will take some minutes or more depends on your CPU: 
 ```
-> cd ..
-> python ipr/Main.py
+> python Main.py
 ```
 4. Explore yourself 
   

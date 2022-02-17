@@ -16,8 +16,8 @@ __KEY = "zkfuuwgc4eoxlaew"
 __IV = "LvAUtf+tnz"
 
 # Input cache file and output directory strings
-__inputPathString = "ipr/EncryptedCache/octocacheevai"
-__outputPathString = "ipr/DecryptedCaches"
+__inputPathString = "EncryptedCache/octocacheevai"
+__outputPathString = "DecryptedCaches"
 
 # Initialization
 console = Console()

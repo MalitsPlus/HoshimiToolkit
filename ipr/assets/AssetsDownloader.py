@@ -12,7 +12,7 @@ import threading
 
 console = Console()
 URL = "https://d2ilil7yh5oi1v.cloudfront.net/solis-{v}-{type}/{o}?generation={g}&alt=media"
-downloadPath = "ipr/Assets/"
+downloadPath = "Assets/"
 path = Path(downloadPath)
 path.mkdir(parents=True, exist_ok=True)
 contents = path.glob("**/*")

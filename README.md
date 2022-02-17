@@ -11,4 +11,4 @@ Currently there are 2 projects:
 And the number might be updated unperiodically.  
 
 ## DISCLAIMER 
-All projects in this repo should be used for study purposes only. You should take responsibilities yourself for using these tools.  
+All projects in this repo should be used for study purposes only. You shall take responsibilities yourself for using these tools.  
