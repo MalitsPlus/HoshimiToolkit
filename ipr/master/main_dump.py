@@ -5,4 +5,5 @@ from sqlcipher_gen import do_gen
 do_gen()
 path = Path("sqlcipher_dec.cmd").absolute()
 args = ["powershell", path]
-subprocess.Popen(args)
+p = subprocess.Popen(args)
+p.wait()
