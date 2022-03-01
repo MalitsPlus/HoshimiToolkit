@@ -13,6 +13,7 @@ db_files = [it for it in Path(db_path).glob("*")]
 for db_file in db_files:
     if db_file.name in ["AssetDownload.db"]:
         continue
+    # Test file name
     if db_file.name != "LiveTip.db":
         continue
     conn = sqlite3.connect(db_file.absolute())

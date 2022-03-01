@@ -1,8 +1,9 @@
 import imp
-import live_tip_pb2
+import caches.master.proto.Skill_pb2 as Skill
 from pathlib import Path
 
-live_tip = live_tip_pb2.LiveTip()
-pb = Path("caches/master/pb/live_tip-low_activating_rate-01").read_bytes()
-live_tip.ParseFromString(pb)
+skill = Skill.Skill()
+pb = Path("caches/master/pb/sk-rio-03-schl-00-1").read_bytes()
+skill.ParseFromString(pb)
+Path("caches/tmp.json").write_bytes(skill.SerializeToString())
 a = 1
