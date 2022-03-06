@@ -1,8 +1,8 @@
 from rich.console import Console
 from pathlib import Path
 
-__inputDirectory = "ipr/Assets/"
-__outputPath = "ipr/UnobfuscateAssets/"
+__inputDirectory = "Assets/"
+__outputPath = "UnobfuscateAssets/"
 console = Console()
 
 def unObfuscate(jDict: dict, offset: int = 0, streamPos: int = 0, headerLength: int = 256):
