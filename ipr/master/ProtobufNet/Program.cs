@@ -1,5 +1,17 @@
 ﻿// See https://aka.ms/new-console-template for more information
 
-var stream = File.OpenRead("sk-ngs-05-idol-00-3");
-Skill skill = Serializer.Deserialize<Skill>(stream);
+var stream = File.OpenRead("dec.bin");
+QuestStartResponse r = Serializer.Deserialize<QuestStartResponse>(stream);
+
+foreach (var chart in r.result.charts) {
+    if (chart.chartType == MusicChartType.Beat) {
+
+    } else if (chart.chartType == MusicChartType.ActiveSkill) {
+
+    } else if (chart.chartType == MusicChartType.SpecialSkill) {
+
+    } else {
+
+    }
+}
 int a = 1;

@@ -13,5 +13,7 @@
 	  <Using Include="ProtoBuf" />
 	  <Using Include="ProtobufNet.Master" />
 	  <Using Include="ProtobufNet.ProtoEnum" />
+	  <Using Include="ProtobufNet.Api" />
+	  <Using Include="ProtobufNet.Transaction" />
   </ItemGroup>
 </Project>
