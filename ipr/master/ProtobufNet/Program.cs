@@ -13,5 +13,8 @@ foreach (var chart in r.result.charts) {
     } else {
 
     }
+    foreach (var status in chart.cardStatuses) {
+        status
+    }
 }
 int a = 1;
