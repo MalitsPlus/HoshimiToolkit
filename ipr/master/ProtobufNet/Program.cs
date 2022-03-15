@@ -1,20 +1,19 @@
-﻿// See https://aka.ms/new-console-template for more information
-
-var stream = File.OpenRead("dec.bin");
-QuestStartResponse r = Serializer.Deserialize<QuestStartResponse>(stream);
-
-foreach (var chart in r.result.charts) {
-    if (chart.chartType == MusicChartType.Beat) {
-
-    } else if (chart.chartType == MusicChartType.ActiveSkill) {
-
-    } else if (chart.chartType == MusicChartType.SpecialSkill) {
-
-    } else {
-
+﻿void generateJson<T>(string pathStr) {
+    List<T> list = new List<T>();
+    DirectoryInfo directoryInfo = new DirectoryInfo(pathStr);
+    foreach (var file in directoryInfo.EnumerateFiles()) {
+        using (var stream = file.OpenRead()) {
+            var obj = Serializer.Deserialize<T>(stream);
+            list.Add(obj);
+        }
     }
-    foreach (var status in chart.cardStatuses) {
-        status
-    }
+    var options = new JsonSerializerOptions { WriteIndented = true };
+    string s = JsonSerializer.Serialize(list, options);
+
+    string output = $"json/{pathStr}.json";
+    File.WriteAllText(output, s);
 }
-int a = 1;
+
+string pathStr = "Setting";
+generateJson<Setting>(pathStr);
+int a = 0;
