@@ -14,7 +14,7 @@ for db_file in db_files:
     if db_file.name in ["AssetDownload.db"]:
         continue
     # Test file name
-    if db_file.name != "Setting.db":
+    if db_file.name != "Card.db":
         continue
     conn = sqlite3.connect(db_file.absolute())
     c = conn.cursor()
@@ -26,4 +26,6 @@ for db_file in db_files:
         for row_tb in cursor_tb:
             id = row_tb[0]
             data = row_tb[1]
-            extract_bin(id, data)
+            path = Path(f"{pb_path}/card_{id}.bin")
+            path.write_bytes(data)
+            # extract_bin(id, data)

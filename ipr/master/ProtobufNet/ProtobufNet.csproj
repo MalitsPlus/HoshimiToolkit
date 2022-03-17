@@ -16,5 +16,6 @@
 	  <Using Include="ProtobufNet.Api" />
 	  <Using Include="ProtobufNet.Transaction" />
 	  <Using Include="System.Text.Json"/>
+	  <Using Include="ProtobufNet"/>
   </ItemGroup>
 </Project>
