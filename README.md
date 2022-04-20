@@ -6,7 +6,7 @@ Each directory in this repo is independent and contains a README in correspondin
 Currently there are 2 projects available: 
 
 * ipr - IDOLY PRIDE
-* lapis - Lapis Re:LiGHTs   
+* lapis - Lapis Re:LiGHTs **(Archived)**
 
 ## DISCLAIMER 
 All projects in this repo should be used for study purposes only.  
