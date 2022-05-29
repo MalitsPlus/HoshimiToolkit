@@ -1,8 +1,10 @@
 # HoshimiToolkit/lapis
-A tool for decrypting assets from Lapis Re:LiGHTs  
+A tool for decrypting assets from Lapis Re:LiGHTs 
+
+This project is marked as **archived**, which means there won't be updates or bug fixes anymore.
 
 ## Before you decide to go...
-Before you decide to use this tool, you should realize even if you can use my ready-made program, it still could be a tough fight to work through the decryption because there are some tricky customizations must be done during the process. That is said, if you don't have any knowledge about programing or reverse-engineering, you'd better close this tab and leave immediately, it's really no need to push yourself to this height. 
+Before you decide to use this tool, you should realize even if you can use my ready-made program, it still could be a tough fight to work through the decryption because there are some tricky customizations must be done during the process. That is said, if you don't have any knowledge about programming or reverse-engineering, you'd better close this tab and leave immediately, it's really no need to push yourself to this height. 
 
 ## How to use
 1. Open `LpsPkgMnfstDcpt.sln` with Visual Studio 2022. 
@@ -28,8 +30,8 @@ Before you decide to use this tool, you should realize even if you can use my re
 4. Copy `Assembly-CSharp.dll`, `Oz.GameFramework.Runtime.dll`, `Il2CppDummyDll.dll` to `./LpsPkgMnfstDcpt/bin/Debug/`. 
 5. Add the above 3 dlls to project **LpsPkgMnfstDcpt**'s reference. 
 6. Move manifest.xml into `./EncryptedFiles/` directory. 
-7. Move whole assets folder into `./EncryptedFiles/` directory. Be sure **NOT** to change any file or directory name because the path is also a part of name of AssetBundles. Every AssetBundle's name starts with "assets/products/xxx".  
-8. Now you are ready to go. Run LpsPkgMnfstDcpt and output AssetBundles should be generated in `./DecryptedFiles`. 
+7. Move whole assets folder into `./EncryptedFiles/` directory. Be sure **NOT** to change any file or directory name because the path is also a part of name of AssetBundles. Every AssetBundle's name starts with `assets/products/xxx`.  
+8. Now you are ready to go. Run LpsPkgMnfstDcpt and output AssetBundles will be generated in `./DecryptedFiles`. 
 
 ---
 You can check [my blog](https://malitsplus.blogspot.com/2022/01/lapis-relights.html) for further details. 

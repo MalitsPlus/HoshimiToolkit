@@ -1,11 +1,11 @@
 # What is this repo 
-This repo contains some of my researches related to reverse-engeering, especially some certain Unity games.  
+This repo contains some of my researches related to reverse-engineering, especially some certain Unity games. 
 
 ## What is in sub-directories 
 Each directory in this repo is independent and contains a README in corresponding directory.  
 Currently there are 2 projects available: 
 
-* ipr - IDOLY PRIDE
+* ipr - IDOLY PRIDE **(Archived)**
 * lapis - Lapis Re:LiGHTs **(Archived)**
 
 ## DISCLAIMER 
