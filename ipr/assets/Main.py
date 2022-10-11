@@ -1,19 +1,10 @@
-from ManifestDecryptor import doDecrypt
-from MaskedHeaderStream import unObfuscate, rename
-from AssetsDownloader import downloadAll
-from eDiffMode import DiffMode
-from eWorkingMode import WorkingMode
+from pathlib import Path
+from octo_manager import update_octo, scale_with_esrgan
 
-# Configurations
-# Diff, All
-diffMode = DiffMode.Diff
-# Local, Remote
-workingMode = WorkingMode.Remote
-# Adjust this param according to your PC's spec
-maxDownloadThread = 20
+def main():
+  enc_bytes = Path("cache/octocacheevai").read_bytes()
+  update_octo(enc_bytes, True)
+  scale_with_esrgan()
 
-jDict = doDecrypt(diffMode)
-if workingMode == WorkingMode.Remote:
-    downloadAll(jDict, maxDownloadThread)
-unObfuscate(jDict)
-rename(jDict)
+if __name__ == "__main__":
+  main()

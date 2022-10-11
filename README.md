@@ -1,13 +1,16 @@
-# What is this repo 
-This repo contains some of my researches related to reverse-engineering, especially some certain Unity games. 
+# What is this repo
 
-## What is in sub-directories 
-Each directory in this repo is independent and contains a README in corresponding directory.  
-Currently there are 2 projects available: 
+This repo contains some of my researches related to reverse-engineering for some certain Unity games.
+
+## What is in sub-directories
+
+Each directory in this repo is independent, with a README in corresponding directory.  
+For now 2 projects are available:
 
 * ipr - IDOLY PRIDE **(Archived)**
 * lapis - Lapis Re:LiGHTs **(Archived)**
 
-## DISCLAIMER 
-All projects in this repo should be used for study purposes only.  
-You shall take responsibilities yourself for using these tools.  
+## DISCLAIMER
+
+Use them at your own risk.  
+You shall take responsibilities yourself for any consequences.  
