@@ -1,0 +1,18 @@
+syntax = "proto3";
+
+message CheckVersionRequest {
+  string version = 1;
+}
+
+message CheckVersionResponse {
+  string version = 1;
+}
+
+message ResourceHostRequest {
+  string rversion = 1;
+}
+
+message ResourceHostResponse {
+  string rversion = 1;
+  string endpoint = 2;
+}
