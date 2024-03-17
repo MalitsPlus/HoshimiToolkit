@@ -1,14 +1,12 @@
+This repo is archived.
+
 # What is this repo
 
-This repo contains some of my researches related to reverse-engineering for some certain Unity games.
+This monorepo contains some of my researches related to reverse-engineering for some certain Unity games.
 
 ## What is in sub-directories
 
-Each directory in this repo is independent, with a README in corresponding directory.  
-For now 2 projects are available:
-
-* ipr - IDOLY PRIDE **(Archived)**
-* lapis - Lapis Re:LiGHTs **(Archived)**
+Each directory in this repo can be considered independent, you can find more detailed information described in the README inside there.
 
 ## DISCLAIMER
 

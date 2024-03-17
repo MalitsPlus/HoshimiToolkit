@@ -4,7 +4,7 @@ A tool for decrypting assets from Lapis Re:LiGHTs
 
 This project was marked as **archived**, which means there won't be updates or bug fixes anymore.
 
-## Before you decide to go...
+## Before you decide to go further...
 
 Before you decide to use this tool, you should realize even if you can use my ready-made program, it still could be a tough fight to work through the decryption because there are some tricky customizations must be done during the process. That said, if you don't have any knowledge about programming or reverse-engineering, you'd better close this tab and leave immediately, it's really no need to push yourself to this height.
 
@@ -35,6 +35,3 @@ Before you decide to use this tool, you should realize even if you can use my re
 6. Move manifest.xml into `./EncryptedFiles/` directory.
 7. Move whole assets folder into `./EncryptedFiles/` directory. Be sure **NOT** to change any file or directory name because the path is also a part of name of AssetBundles. Every AssetBundle's name starts with `assets/products/xxx`.  
 8. Now you are ready to go. Run LpsPkgMnfstDcpt and output AssetBundles will be generated in `./DecryptedFiles`.
-
----
-You can check [my blog](https://malitsplus.blogspot.com/2022/01/lapis-relights.html) for further details.
